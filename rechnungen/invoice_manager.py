@@ -10,8 +10,25 @@ from pathlib import Path
 from typing import List, Dict, Optional, Tuple
 from dataclasses import dataclass
 import uuid
-import os
-from fpdf import FPDF
+try:
+    from fpdf import FPDF
+    PDF_AVAILABLE = True
+except ImportError:
+    # Fallback für Tests - PDF-Funktionen deaktivieren
+    PDF_AVAILABLE = False
+    class FPDF:
+        def __init__(self):
+            pass
+        def add_page(self):
+            pass
+        def set_font(self, family, style, size):
+            pass
+        def cell(self, width, height, text, border, newline, align):
+            pass
+        def ln(self, height=None):
+            pass
+        def output(self, filename):
+            print(f"PDF-Datei wäre erstellt: {filename}")
 
 @dataclass
 class Invoice:

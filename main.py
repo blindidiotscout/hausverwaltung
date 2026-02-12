@@ -11,7 +11,14 @@ from pathlib import Path
 from datetime import datetime
 from typing import Optional
 
-# Importiere alle Module
+# Importiere alle Module (mit lokalen Pfaden)
+import sys
+from pathlib import Path
+
+# Aktueller Pfad zum Python-Path hinzufügen
+current_dir = Path(__file__).parent
+sys.path.insert(0, str(current_dir))
+
 from config import Config
 from immo.properties import PropertyManager
 from mieter.tenants import TenantManager
