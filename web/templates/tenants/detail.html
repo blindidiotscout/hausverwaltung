@@ -1,0 +1,228 @@
+{% extends "base.html" %}
+
+{% block title %}{{ tenant.first_name }} {{ tenant.last_name }} - Mieter{% endblock %}
+
+{% block content %}
+<div class="mb-6">
+    <nav class="text-sm text-gray-500 mb-2">
+        <a href="/tenants" class="hover:text-blue-500">Mieter</a>
+        <i class="fas fa-chevron-right mx-2 text-xs"></i>
+        <span class="text-gray-700">{{ tenant.first_name }} {{ tenant.last_name }}</span>
+    </nav>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Tenant Info -->
+    <div class="lg:col-span-1">
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <div class="p-6">
+                <div class="flex items-center mb-4">
+                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center text-green-600 font-bold text-2xl mr-4">
+                        {{ tenant.first_name[0] }}{{ tenant.last_name[0] }}
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold text-gray-800">{{ tenant.first_name }} {{ tenant.last_name }}</h1>
+                        <p class="text-sm text-gray-500">Mieter</p>
+                    </div>
+                </div>
+                
+                <div class="space-y-3 text-sm">
+                    {% if tenant.email %}
+                    <div class="flex items-center text-gray-600">
+                        <i class="fas fa-envelope w-5 text-gray-400"></i>
+                        <a href="mailto:{{ tenant.email }}" class="hover:text-blue-500">{{ tenant.email }}</a>
+                    </div>
+                    {% endif %}
+                    {% if tenant.phone %}
+                    <div class="flex items-center text-gray-600">
+                        <i class="fas fa-phone w-5 text-gray-400"></i>
+                        <a href="tel:{{ tenant.phone }}" class="hover:text-blue-500">{{ tenant.phone }}</a>
+                    </div>
+                    {% endif %}
+                    {% if tenant.birth_date %}
+                    <div class="flex items-center text-gray-600">
+                        <i class="fas fa-birthday-cake w-5 text-gray-400"></i>
+                        {{ tenant.birth_date }}
+                    </div>
+                    {% endif %}
+                    {% if tenant.address %}
+                    <div class="flex items-center text-gray-600">
+                        <i class="fas fa-home w-5 text-gray-400"></i>
+                        {{ tenant.address }}
+                    </div>
+                    {% endif %}
+                    {% if tenant.iban %}
+                    <div class="flex items-center text-gray-600">
+                        <i class="fas fa-university w-5 text-gray-400"></i>
+                        <span class="font-mono text-xs">{{ tenant.iban }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="bg-gray-50 px-6 py-3">
+                <a href="/tenants/{{ tenant.id }}/edit" class="text-blue-500 hover:text-blue-700 text-sm">
+                    <i class="fas fa-edit mr-1"></i>Daten bearbeiten
+                </a>
+            </div>
+        </div>
+        
+        <!-- Assigned Unit -->
+        {% if unit %}
+        <div class="bg-white rounded-xl shadow-md p-6 mt-6">
+            <h2 class="font-semibold text-gray-800 mb-3">
+                <i class="fas fa-door-closed mr-2 text-blue-500"></i>Vermietet in
+            </h2>
+            <p class="font-medium text-gray-800">{{ unit.property_name }}</p>
+            <p class="text-sm text-gray-500">{{ unit.property_address }}</p>
+            <p class="text-sm text-gray-600 mt-2">Einheit {{ unit.unit_number }}</p>
+            <p class="text-lg font-bold text-green-600 mt-2">{{ "%.2f"|format(unit.rent_brutto) }} € / Monat</p>
+        </div>
+        {% else %}
+        <div class="bg-yellow-50 rounded-xl p-6 mt-6 border border-yellow-200">
+            <p class="text-yellow-700">
+                <i class="fas fa-exclamation-triangle mr-2"></i>
+                Keine Wohneinheit zugewiesen
+            </p>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Documents -->
+    <div class="lg:col-span-2">
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+                <h2 class="font-semibold text-gray-800">
+                    <i class="fas fa-folder mr-2 text-blue-500"></i>Dokumente
+                </h2>
+                <button onclick="document.getElementById('uploadModal').classList.remove('hidden')" 
+                    class="px-3 py-1.5 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600">
+                    <i class="fas fa-upload mr-1"></i>Hochladen
+                </button>
+            </div>
+            
+            {% if documents %}
+            <div class="divide-y">
+                {% for doc in documents %}
+                <div class="p-4 flex items-center hover:bg-gray-50">
+                    <div class="flex-shrink-0 mr-4">
+                        {% if doc.mime_type and 'pdf' in doc.mime_type %}
+                        <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-file-pdf text-red-500 text-xl"></i>
+                        </div>
+                        {% elif doc.mime_type and 'image' in doc.mime_type %}
+                        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-file-image text-green-500 text-xl"></i>
+                        </div>
+                        {% else %}
+                        <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-file text-gray-500 text-xl"></i>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="flex-grow">
+                        <p class="font-medium text-gray-800">{{ doc.title or doc.filename }}</p>
+                        <div class="flex items-center text-xs text-gray-500 mt-1 space-x-3">
+                            <span class="px-2 py-0.5 bg-gray-100 rounded">{{ doc.document_type }}</span>
+                            {% if doc.file_size %}
+                            <span>{{ "%.1f"|format(doc.file_size / 1024) }} KB</span>
+                            {% endif %}
+                            <span>{{ doc.created_at[:10] }}</span>
+                        </div>
+                        {% if doc.notes %}
+                        <p class="text-xs text-gray-400 mt-1">{{ doc.notes }}</p>
+                        {% endif %}
+                    </div>
+                    <div class="flex-shrink-0 flex space-x-2">
+                        <a href="/documents/{{ doc.id }}/download" 
+                            class="px-3 py-1.5 bg-gray-100 text-gray-700 text-sm rounded hover:bg-gray-200">
+                            <i class="fas fa-download"></i>
+                        </a>
+                        <form action="/documents/{{ doc.id }}/delete" method="post" class="inline" 
+                            onsubmit="return confirm('Dokument wirklich löschen?')">
+                            <button type="submit" class="px-3 py-1.5 bg-red-100 text-red-600 text-sm rounded hover:bg-red-200">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="p-8 text-center text-gray-500">
+                <i class="fas fa-folder-open text-4xl text-gray-300 mb-3"></i>
+                <p>Keine Dokumente vorhanden</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Upload Modal -->
+<div id="uploadModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-xl shadow-xl max-w-md w-full mx-4">
+        <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+            <h3 class="font-semibold text-gray-800">Dokument hochladen</h3>
+            <button onclick="document.getElementById('uploadModal').classList.add('hidden')" 
+                class="text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <form action="/tenants/{{ tenant.id }}/documents/upload" method="post" enctype="multipart/form-data" class="p-6">
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Dokumenttyp *</label>
+                    <select name="document_type" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <option value="Mietvertrag">Mietvertrag</option>
+                        <option value="Mietaufhebungsvertrag">Mietaufhebungsvertrag</option>
+                        <option value="Übernahmekostenabrechnung">Übernahmekostenabrechnung</option>
+                        <option value="Personalausweis">Personalausweis (Kopie)</option>
+                        <option value="Meldebescheinigung">Meldebescheinigung</option>
+                        <option value="Bankverbindung">Bankverbindung</option>
+                        <option value="Sonstiges">Sonstiges</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Titel / Beschreibung</label>
+                    <input type="text" name="title" placeholder="z.B. Mietvertrag 2024"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Zugehöriges Objekt</label>
+                    <select name="property_id" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <option value="">-- Kein Objekt --</option>
+                        {% for p in properties %}
+                        <option value="{{ p.id }}">{{ p.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Datei *</label>
+                    <input type="file" name="file" required accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                    <p class="text-xs text-gray-400 mt-1">PDF, Bilder, Word-Dokumente</p>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Notizen</label>
+                    <textarea name="notes" rows="2" placeholder="Interne Notizen..."
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"></textarea>
+                </div>
+            </div>
+            
+            <div class="mt-6 flex justify-end space-x-3">
+                <button type="button" onclick="document.getElementById('uploadModal').classList.add('hidden')"
+                    class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">
+                    Abbrechen
+                </button>
+                <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+                    <i class="fas fa-upload mr-1"></i>Hochladen
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

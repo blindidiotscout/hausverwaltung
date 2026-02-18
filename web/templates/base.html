@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Hausverwaltung{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#64748b',
+                    }
+                }
+            }
+        }
+    </script>
+    {% block head %}{% endblock %}
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="/" class="flex items-center text-gray-700 hover:text-primary">
+                        <i class="fas fa-building mr-2"></i>
+                        <span class="font-bold text-lg hidden sm:inline">Hausverwaltung</span>
+                    </a>
+                </div>
+                <div class="flex items-center space-x-1 sm:space-x-2">
+                    <a href="/properties" class="nav-link {% if request.url.path.startswith('/properties') %}text-primary font-semibold{% else %}text-gray-600{% endif %} hover:text-primary px-2 py-2 sm:px-3 text-sm sm:text-base">
+                        <i class="fas fa-home sm:mr-1"></i><span class="hidden sm:inline">Immobilien</span>
+                    </a>
+                    <a href="/tenants" class="nav-link {% if request.url.path.startswith('/tenants') %}text-primary font-semibold{% else %}text-gray-600{% endif %} hover:text-primary px-2 py-2 sm:px-3 text-sm sm:text-base">
+                        <i class="fas fa-users sm:mr-1"></i><span class="hidden sm:inline">Mieter</span>
+                    </a>
+                    <a href="/invoices" class="nav-link {% if request.url.path.startswith('/invoices') %}text-primary font-semibold{% else %}text-gray-600{% endif %} hover:text-primary px-2 py-2 sm:px-3 text-sm sm:text-base">
+                        <i class="fas fa-file-invoice-euro sm:mr-1"></i><span class="hidden sm:inline">Rechnungen</span>
+                    </a>
+                    <a href="/maintenance" class="nav-link {% if request.url.path.startswith('/maintenance') %}text-primary font-semibold{% else %}text-gray-600{% endif %} hover:text-primary px-2 py-2 sm:px-3 text-sm sm:text-base">
+                        <i class="fas fa-wrench sm:mr-1"></i><span class="hidden sm:inline">Wartung</span>
+                    </a>
+                    <a href="/contractors" class="nav-link {% if request.url.path.startswith('/contractors') %}text-primary font-semibold{% else %}text-gray-600{% endif %} hover:text-primary px-2 py-2 sm:px-3 text-sm sm:text-base">
+                        <i class="fas fa-hard-hat sm:mr-1"></i><span class="hidden sm:inline">Handwerker</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 py-6">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t mt-8 py-4">
+        <div class="max-w-7xl mx-auto px-4 text-center text-gray-500 text-sm">
+            Hausverwaltung Software &copy; 2026
+        </div>
+    </footer>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

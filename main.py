@@ -29,25 +29,26 @@ from reports.dashboard import Dashboard
 
 class HausverwaltungApp:
     def __init__(self):
+        current_dir = Path(__file__).parent
         self.config = Config()
-        self.db_path = Path(self.config.database_url.replace("sqlite:///", ""))
-        
+        # Einfacher Pfad für Datenbank (relativ zum Projekt)
+        self.db_path = Path("hausverwaltung.db")
         # Repository-Struktur für die Dateien erstellen
         self.repo_structure = {
-            'database': self.db_path,
-            'invoices_pdfs': Path('./rechnungen/pdf'),
-            'documents': Path('./docs/documents'),
-            'reports': Path('./reports/output'),
-            'backups': Path('./backups')
+            'database': Path(self.db_path),
+            'invoices_pdfs': current_dir / 'rechnungen' / 'pdf',
+            'documents': current_dir / 'docs' / 'documents',  
+            'reports': current_dir / 'reports' / 'output',
+            'backups': current_dir / 'backups'
         }
         
         # Manager-Instanzen erstellen
-        self.property_manager = PropertyManager(self.db_path)
-        self.tenant_manager = TenantManager(self.db_path)
-        self.payment_manager = PaymentManager(self.db_path)
-        self.invoice_manager = InvoiceManager(self.db_path)
-        self.maintenance_manager = MaintenanceManager(self.db_path)
-        self.dashboard = Dashboard(self.db_path)
+        self.property_manager = PropertyManager(current_dir / self.db_path)
+        self.tenant_manager = TenantManager(current_dir / self.db_path)
+        self.payment_manager = PaymentManager(current_dir / self.db_path)
+        self.invoice_manager = InvoiceManager(current_dir / self.db_path)
+        self.maintenance_manager = MaintenanceManager(current_dir / self.db_path)
+        self.dashboard = Dashboard(current_dir / self.db_path)
     
     def init_database(self, force: bool = False):
         """Datenbank initialisieren"""
