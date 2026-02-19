@@ -70,6 +70,47 @@ async def dashboard(request: Request):
         LIMIT 5
     """).fetchall()
     
+    # Tenant Contract Progress with calculated progress
+    tenant_contracts_raw = conn.execute("""
+        SELECT t.id, t.first_name, t.last_name, t.contract_start, t.contract_end,
+               u.unit_number, p.name as property_name
+        FROM tenants t
+        LEFT JOIN units u ON t.id = u.tenant_id
+        LEFT JOIN properties p ON u.property_id = p.id
+        WHERE t.contract_start IS NOT NULL AND t.contract_end IS NOT NULL
+        ORDER BY t.contract_end ASC
+    """).fetchall()
+    
+    # Calculate progress for each tenant
+    today = datetime.now().date()
+    tenant_contracts = []
+    for t in tenant_contracts_raw:
+        try:
+            start = datetime.strptime(t["contract_start"], "%Y-%m-%d").date()
+            end = datetime.strptime(t["contract_end"], "%Y-%m-%d").date()
+            total_days = (end - start).days
+            elapsed_days = (today - start).days
+            remaining_days = (end - today).days
+            
+            if total_days > 0:
+                progress = min(100, round((elapsed_days / total_days) * 100, 1))
+            else:
+                progress = 0
+            
+            tenant_contracts.append({
+                "id": t["id"],
+                "first_name": t["first_name"],
+                "last_name": t["last_name"],
+                "contract_start": t["contract_start"],
+                "contract_end": t["contract_end"],
+                "unit_number": t["unit_number"],
+                "property_name": t["property_name"],
+                "progress": progress,
+                "remaining_days": remaining_days,
+            })
+        except (ValueError, TypeError):
+            continue
+    
     conn.close()
     
     return templates.TemplateResponse("dashboard.html", {
@@ -82,6 +123,7 @@ async def dashboard(request: Request):
         "open_invoices_total": open_invoices["total"],
         "maintenance_upcoming": maintenance_upcoming,
         "recent_payments": recent_payments,
+        "tenant_contracts": tenant_contracts,
     })
 
 # ==================== PROPERTIES ====================
@@ -331,12 +373,14 @@ async def tenant_create(
     address: str = Form(""),
     iban: str = Form(""),
     bic: str = Form(""),
+    contract_start: str = Form(""),
+    contract_end: str = Form(""),
 ):
     conn = get_db()
     conn.execute("""
-        INSERT INTO tenants (first_name, last_name, email, phone, birth_date, address, iban, bic)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    """, (first_name, last_name, email, phone, birth_date or None, address, iban, bic))
+        INSERT INTO tenants (first_name, last_name, email, phone, birth_date, address, iban, bic, contract_start, contract_end)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """, (first_name, last_name, email, phone, birth_date or None, address, iban, bic, contract_start or None, contract_end or None))
     conn.commit()
     conn.close()
     return RedirectResponse(url="/tenants", status_code=303)
@@ -361,12 +405,14 @@ async def tenant_update(
     address: str = Form(""),
     iban: str = Form(""),
     bic: str = Form(""),
+    contract_start: str = Form(""),
+    contract_end: str = Form(""),
 ):
     conn = get_db()
     conn.execute("""
-        UPDATE tenants SET first_name=?, last_name=?, email=?, phone=?, birth_date=?, address=?, iban=?, bic=?, updated_at=CURRENT_TIMESTAMP
+        UPDATE tenants SET first_name=?, last_name=?, email=?, phone=?, birth_date=?, address=?, iban=?, bic=?, contract_start=?, contract_end=?, updated_at=CURRENT_TIMESTAMP
         WHERE id=?
-    """, (first_name, last_name, email, phone, birth_date or None, address, iban, bic, tenant_id))
+    """, (first_name, last_name, email, phone, birth_date or None, address, iban, bic, contract_start or None, contract_end or None, tenant_id))
     conn.commit()
     conn.close()
     return RedirectResponse(url="/tenants", status_code=303)
