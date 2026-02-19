@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="de" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,7 +7,14 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script>
+        // Dark mode initialization (before DOM loads to prevent flash)
+        if (localStorage.getItem('darkMode') === 'true' ||
+            (!localStorage.getItem('darkMode') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        }
+        
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
@@ -20,33 +27,38 @@
     </script>
     {% block head %}{% endblock %}
 </head>
-<body class="bg-gray-100 min-h-screen">
+<body class="bg-gray-100 dark:bg-gray-900 min-h-screen transition-colors duration-200">
     <!-- Navigation -->
-    <nav class="bg-white shadow-lg">
+    <nav class="bg-white dark:bg-gray-800 shadow-lg transition-colors duration-200">
         <div class="max-w-7xl mx-auto px-4">
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
-                    <a href="/" class="flex items-center text-gray-700 hover:text-primary">
+                    <a href="/" class="flex items-center text-gray-700 dark:text-gray-300 dark:text-gray-200 hover:text-primary">
                         <i class="fas fa-building mr-2"></i>
                         <span class="font-bold text-lg hidden sm:inline">Hausverwaltung</span>
                     </a>
                 </div>
                 <div class="flex items-center space-x-1 sm:space-x-2">
-                    <a href="/properties" class="nav-link {% if request.url.path.startswith('/properties') %}text-primary font-semibold{% else %}text-gray-600{% endif %} hover:text-primary px-2 py-2 sm:px-3 text-sm sm:text-base">
+                    <a href="/properties" class="nav-link {% if request.url.path.startswith('/properties') %}text-primary font-semibold{% else %}text-gray-600 dark:text-gray-300{% endif %} hover:text-primary px-2 py-2 sm:px-3 text-sm sm:text-base">
                         <i class="fas fa-home sm:mr-1"></i><span class="hidden sm:inline">Immobilien</span>
                     </a>
-                    <a href="/tenants" class="nav-link {% if request.url.path.startswith('/tenants') %}text-primary font-semibold{% else %}text-gray-600{% endif %} hover:text-primary px-2 py-2 sm:px-3 text-sm sm:text-base">
+                    <a href="/tenants" class="nav-link {% if request.url.path.startswith('/tenants') %}text-primary font-semibold{% else %}text-gray-600 dark:text-gray-300{% endif %} hover:text-primary px-2 py-2 sm:px-3 text-sm sm:text-base">
                         <i class="fas fa-users sm:mr-1"></i><span class="hidden sm:inline">Mieter</span>
                     </a>
-                    <a href="/invoices" class="nav-link {% if request.url.path.startswith('/invoices') %}text-primary font-semibold{% else %}text-gray-600{% endif %} hover:text-primary px-2 py-2 sm:px-3 text-sm sm:text-base">
+                    <a href="/invoices" class="nav-link {% if request.url.path.startswith('/invoices') %}text-primary font-semibold{% else %}text-gray-600 dark:text-gray-300{% endif %} hover:text-primary px-2 py-2 sm:px-3 text-sm sm:text-base">
                         <i class="fas fa-file-invoice-euro sm:mr-1"></i><span class="hidden sm:inline">Rechnungen</span>
                     </a>
-                    <a href="/maintenance" class="nav-link {% if request.url.path.startswith('/maintenance') %}text-primary font-semibold{% else %}text-gray-600{% endif %} hover:text-primary px-2 py-2 sm:px-3 text-sm sm:text-base">
+                    <a href="/maintenance" class="nav-link {% if request.url.path.startswith('/maintenance') %}text-primary font-semibold{% else %}text-gray-600 dark:text-gray-300{% endif %} hover:text-primary px-2 py-2 sm:px-3 text-sm sm:text-base">
                         <i class="fas fa-wrench sm:mr-1"></i><span class="hidden sm:inline">Wartung</span>
                     </a>
-                    <a href="/contractors" class="nav-link {% if request.url.path.startswith('/contractors') %}text-primary font-semibold{% else %}text-gray-600{% endif %} hover:text-primary px-2 py-2 sm:px-3 text-sm sm:text-base">
+                    <a href="/contractors" class="nav-link {% if request.url.path.startswith('/contractors') %}text-primary font-semibold{% else %}text-gray-600 dark:text-gray-300{% endif %} hover:text-primary px-2 py-2 sm:px-3 text-sm sm:text-base">
                         <i class="fas fa-hard-hat sm:mr-1"></i><span class="hidden sm:inline">Handwerker</span>
                     </a>
+                    <!-- Dark Mode Toggle -->
+                    <button id="darkModeToggle" class="text-gray-600 dark:text-gray-300 hover:text-primary px-2 py-2 sm:px-3 text-lg" title="Dark Mode umschalten">
+                        <i class="fas fa-moon dark:hidden"></i>
+                        <i class="fas fa-sun hidden dark:inline"></i>
+                    </button>
                 </div>
             </div>
         </div>
@@ -58,11 +70,19 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-white border-t mt-8 py-4">
-        <div class="max-w-7xl mx-auto px-4 text-center text-gray-500 text-sm">
+    <footer class="bg-white dark:bg-gray-800 border-t dark:border-gray-700 mt-8 py-4 transition-colors duration-200">
+        <div class="max-w-7xl mx-auto px-4 text-center text-gray-500 dark:text-gray-400 text-sm">
             Hausverwaltung Software &copy; 2026
         </div>
     </footer>
+
+    <!-- Dark Mode Toggle Script -->
+    <script>
+        document.getElementById('darkModeToggle').addEventListener('click', function() {
+            document.documentElement.classList.toggle('dark');
+            localStorage.setItem('darkMode', document.documentElement.classList.contains('dark'));
+        });
+    </script>
 
     {% block scripts %}{% endblock %}
 </body>

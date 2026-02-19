@@ -7,22 +7,22 @@
     <nav class="text-sm text-gray-500 mb-2">
         <a href="/properties" class="hover:text-blue-500">Immobilien</a>
         <i class="fas fa-chevron-right mx-2 text-xs"></i>
-        <span class="text-gray-700">{{ property.name }}</span>
+        <span class="text-gray-700 dark:text-gray-300">{{ property.name }}</span>
     </nav>
 </div>
 
-<div class="bg-white rounded-xl shadow-md overflow-hidden mb-6">
+<div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden mb-6">
     <div class="p-6">
         <div class="flex justify-between items-start">
             <div>
-                <h1 class="text-2xl font-bold text-gray-800">{{ property.name }}</h1>
+                <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-100">{{ property.name }}</h1>
                 <p class="text-gray-600 mt-1">
-                    <i class="fas fa-map-marker-alt mr-1 text-gray-400"></i>
+                    <i class="fas fa-map-marker-alt mr-1 text-gray-400 dark:text-gray-500"></i>
                     {{ property.address }}, {{ property.zip_code or "" }} {{ property.city }}
                 </p>
             </div>
             <div class="flex space-x-2">
-                <a href="/properties/{{ property.id }}/edit" class="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">
+                <a href="/properties/{{ property.id }}/edit" class="px-3 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200">
                     <i class="fas fa-edit mr-1"></i>Bearbeiten
                 </a>
                 <form action="/properties/{{ property.id }}/delete" method="post" class="inline" onsubmit="return confirm('Wirklich löschen?')">
@@ -35,34 +35,34 @@
     </div>
     
     <!-- Property Details -->
-    <div class="border-t grid grid-cols-2 md:grid-cols-4 gap-4 p-6 bg-gray-50">
+    <div class="border-t grid grid-cols-2 md:grid-cols-4 gap-4 p-6 bg-gray-50 dark:bg-gray-700">
         <div>
-            <p class="text-sm text-gray-500">Typ</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500">Typ</p>
             <p class="font-medium">{{ property.property_type }}</p>
         </div>
         <div>
-            <p class="text-sm text-gray-500">Einheiten</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500">Einheiten</p>
             <p class="font-medium">{{ property.units }}</p>
         </div>
         <div>
-            <p class="text-sm text-gray-500">Gesamtfläche</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500">Gesamtfläche</p>
             <p class="font-medium">{{ "%.0f"|format(property.total_area) if property.total_area else "-" }} m²</p>
         </div>
         <div>
-            <p class="text-sm text-gray-500">Kaufpreis</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500">Kaufpreis</p>
             <p class="font-medium">{{ "%.2f"|format(property.purchase_price) if property.purchase_price else "-" }} €</p>
         </div>
     </div>
 </div>
 
 <!-- Units -->
-<div class="bg-white rounded-xl shadow-md overflow-hidden">
-    <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
-        <h2 class="font-semibold text-gray-800">
+<div class="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden">
+    <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center">
+        <h2 class="font-semibold text-gray-800 dark:text-gray-100">
             <i class="fas fa-door-closed mr-2 text-blue-500"></i>Wohneinheiten
         </h2>
         <div class="flex items-center space-x-3">
-            <span class="text-sm text-gray-500">{{ units|length }} Einheiten</span>
+            <span class="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-500">{{ units|length }} Einheiten</span>
             <a href="/properties/{{ property.id }}/units/new" class="px-3 py-1.5 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600">
                 <i class="fas fa-plus mr-1"></i>Neue Einheit
             </a>
@@ -72,12 +72,12 @@
     {% if units %}
     <div class="divide-y">
         {% for u in units %}
-        <div class="p-4 hover:bg-gray-50">
+        <div class="p-4 hover:bg-gray-50 dark:bg-gray-700">
             <div class="flex items-center">
                 <div class="flex-grow">
                     <div class="flex items-center justify-between mb-2">
                         <div>
-                            <span class="font-medium text-gray-800">Einheit {{ u.unit_number }}</span>
+                            <span class="font-medium text-gray-800 dark:text-gray-100">Einheit {{ u.unit_number }}</span>
                             {% if u.floor is not none %}
                             <span class="text-sm text-gray-500 ml-2">Stock {{ u.floor }}</span>
                             {% endif %}
@@ -87,7 +87,7 @@
                         </div>
                         <div class="flex items-center space-x-3">
                             {% if u.rent_brutto %}
-                            <span class="font-medium text-gray-800">{{ "%.2f"|format(u.rent_brutto) }} €</span>
+                            <span class="font-medium text-gray-800 dark:text-gray-100">{{ "%.2f"|format(u.rent_brutto) }} €</span>
                             {% endif %}
                             {% if u.status == 'occupied' %}
                             <span class="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">
@@ -100,7 +100,7 @@
                             {% elif u.status == 'reserved' %}
                             <span class="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">Reserviert</span>
                             {% else %}
-                            <span class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full">{{ u.status }}</span>
+                            <span class="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs rounded-full">{{ u.status }}</span>
                             {% endif %}
                         </div>
                     </div>
@@ -118,10 +118,10 @@
             </div>
             
             <!-- Mieter zuweisen / entfernen -->
-            <div class="mt-3 pt-3 border-t border-gray-100">
+            <div class="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
                 {% if u.tenant_id %}
                 <div class="flex items-center justify-between">
-                    <span class="text-sm text-gray-600">
+                    <span class="text-sm text-gray-600 dark:text-gray-400 dark:text-gray-500">
                         <i class="fas fa-user mr-1 text-green-500"></i>
                         {{ u.first_name }} {{ u.last_name }}
                     </span>
@@ -163,16 +163,16 @@
 {% if units %}
 <div class="mt-6 grid grid-cols-3 gap-4">
     <div class="bg-white rounded-lg shadow-sm p-4 text-center">
-        <p class="text-2xl font-bold text-gray-800">{{ units|length }}</p>
-        <p class="text-xs text-gray-500">Gesamt</p>
+        <p class="text-2xl font-bold text-gray-800 dark:text-gray-100">{{ units|length }}</p>
+        <p class="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">Gesamt</p>
     </div>
     <div class="bg-green-50 rounded-lg shadow-sm p-4 text-center">
         <p class="text-2xl font-bold text-green-600">{{ units|selectattr('status', 'equalto', 'occupied')|list|length }}</p>
-        <p class="text-xs text-gray-500">Vermietet</p>
+        <p class="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">Vermietet</p>
     </div>
     <div class="bg-yellow-50 rounded-lg shadow-sm p-4 text-center">
         <p class="text-2xl font-bold text-yellow-600">{{ units|selectattr('status', 'equalto', 'vacant')|list|length }}</p>
-        <p class="text-xs text-gray-500">Leerstand</p>
+        <p class="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-500">Leerstand</p>
     </div>
 </div>
 {% endif %}
