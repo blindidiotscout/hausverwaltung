@@ -55,12 +55,13 @@ class HausverwaltungApp:
         if force and self.db_path.exists():
             self.db_path.unlink()
         
-        # Verzeichnisse erstellen
-        for path in self.repo_structure.values():
-            path.mkdir(parents=True, exist_ok=True)
+        # Verzeichnisse erstellen (nur für Ordner, nicht für Datenbank-Datei)
+        for key, path in self.repo_structure.items():
+            if key != 'database':  # Datenbank ist eine Datei, kein Verzeichnis
+                path.mkdir(parents=True, exist_ok=True)
         
         # Datenbank-Schema erstellen
-        conn = sqlite3.connect(self.db_path)
+        conn = sqlite3.connect(str(self.db_path))
         cursor = conn.cursor()
         
         # Property-Tabelle
